@@ -94,7 +94,7 @@ if __name__ == "__main__":
     max_det = 1000  # 每张图像的最大检测次数
     device = ''  # cuda 设备，即 0 或 0,1,2,3 或 cpu
     view_img = False  # 结果弹出展示
-    save_txt = False  # 保存文本结果
+    save_txt = True  # 保存文本结果
     save_conf = False  # save confidences in --save-txt labels
     save_crop = False  # 将识别到的物体抠出来保存图片
     nosave = False  # True 什么结果都不保存
@@ -137,6 +137,11 @@ if __name__ == "__main__":
     for path, img, im0s, vid_cap in dataset:
         pred, dt, seen, img = runInterface(model, save_dir, device, half, conf_thres, iou_thres, None, agnostic_nms,
                                            max_det, dataset, False, onnx, path, img)
+        print("---------------")
+        # 这个pred是非常重要的数据，是最终的结果
+        # 内涵一个tensor类型的二维数组，每个小数组的最后一位是结果，其他的东西疑似坐标
+        # 所有的数据全部是类似科学记数法的tensor类型
+        print(pred)
         for i, det in enumerate(pred):  # per image
             seen += 1
             if webcam:  # batch_size >= 1
@@ -163,9 +168,6 @@ if __name__ == "__main__":
                     n = (det[:, -1] == c).sum()  # detections per class
                     # 人是names[0]
 
-                    print(names)
-
-
                 # Write results
                 for *xyxy, conf, cls in reversed(det):
                     if save_txt:  # Write to file
@@ -190,4 +192,10 @@ if __name__ == "__main__":
             print("识别结束")
             cv2.imshow("show", im0)
             cv2.waitKey(0)
+
+            if save_img:
+                if dataset.mode == 'image':
+                    cv2.imwrite(save_path, im0)
+
+
 
