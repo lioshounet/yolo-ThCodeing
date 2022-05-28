@@ -50,7 +50,6 @@ def loadModel(weights, half, device):
             model.half()  # to FP16
     return model, onnx, stride, names, pt, half, device
 
-
 def runInterface(model, save_dir, device, half, conf_thres, iou_thres, classes, agnostic_nms, max_det, dataset,
                  visualize, onnx, path, img):
     if pt and device.type != 'cpu':
@@ -77,7 +76,6 @@ def runInterface(model, save_dir, device, half, conf_thres, iou_thres, classes, 
     pred = non_max_suppression(pred, conf_thres, iou_thres, classes, agnostic_nms, max_det=max_det)
     dt[2] += time_sync() - t3
     return pred, dt, seen, img
-
 
 if __name__ == "__main__":
     weights = ROOT / 'yolov5s.pt'  # 模型位置
@@ -134,10 +132,11 @@ if __name__ == "__main__":
     save_dir = increment_path(Path(project) / name, exist_ok=exist_ok)  # increment run
     (save_dir / 'labels' if save_txt else save_dir).mkdir(parents=True, exist_ok=exist_ok)  # make dir
     dangerState = 0
+
+
     for path, img, im0s, vid_cap in dataset:
         pred, dt, seen, img = runInterface(model, save_dir, device, half, conf_thres, iou_thres, None, agnostic_nms,
                                            max_det, dataset, False, onnx, path, img)
-        danger = False
         for i, det in enumerate(pred):  # per image
             seen += 1
             if webcam:  # batch_size >= 1
@@ -159,11 +158,13 @@ if __name__ == "__main__":
                 det[:, :4] = scale_coords(img.shape[2:], det[:, :4], im0.shape).round()
 
                 # Print results
+                print('\n')
                 for c in det[:, -1].unique():
                     n = (det[:, -1] == c).sum()  # detections per class
                     # 人是names[0]
-                    if c == 0 and n > 0:
-                        danger = True
+
+                    print(names)
+
 
                 # Write results
                 for *xyxy, conf, cls in reversed(det):
@@ -185,42 +186,8 @@ if __name__ == "__main__":
 
             # Stream results
             im0 = annotator.result()
-            if danger:
-                print("识别到人")
-                cv2.imshow("show", im0)
-                cv2.waitKey(0)
-            else:
-                cv2.putText(im0, "safe", (200, 200), cv2.FONT_HERSHEY_SIMPLEX, 1.5, (0, 255, 0), 6)
-            if view_img:
-                cv2.imshow(str(p), im0)
-                cv2.waitKey(1)  # 1 millisecond
 
-            # Save results (image with detections)
-            #视频相关后续操作
-            # if save_img:
-            #     if dataset.mode == 'image':
-            #         cv2.imwrite(save_path, im0)
-            #     else:  # 'video' or 'stream'
-            #         if vid_path[i] != save_path:  # new video
-            #             vid_path[i] = save_path
-            #             if isinstance(vid_writer[i], cv2.VideoWriter):
-            #                 vid_writer[i].release()  # release previous video writer
-            #             if vid_cap:  # video
-            #                 fps = vid_cap.get(cv2.CAP_PROP_FPS)
-            #                 w = int(vid_cap.get(cv2.CAP_PROP_FRAME_WIDTH))
-            #                 h = int(vid_cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
-            #             else:  # stream
-            #                 fps, w, h = 30, im0.shape[1], im0.shape[0]
-            #                 save_path += '.mp4'
-            #             vid_writer[i] = cv2.VideoWriter(save_path, cv2.VideoWriter_fourcc(*'mp4v'), fps, (w, h))
-            #         vid_writer[i].write(im0)
-
-
-
-
-
-
-
-
-
+            print("识别结束")
+            cv2.imshow("show", im0)
+            cv2.waitKey(0)
 

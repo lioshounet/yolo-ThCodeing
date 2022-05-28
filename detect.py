@@ -159,17 +159,17 @@ if __name__ == "__main__":
                         if dangerState == 0:
                             # 切屏
                             print("切屏")
-                            # keyboard.press(Key.alt)
-                            # keyboard.press(Key.tab)
-                            # keyboard.release(Key.tab)
-                            # keyboard.release(Key.alt)
-                            # dangerState = 1
+                            keyboard.press(Key.alt)
+                            keyboard.press(Key.tab)
+                            keyboard.release(Key.tab)
+                            keyboard.release(Key.alt)
+                            dangerState = 1
                     elif c==0 and n == 0:
                         print(dangerState)
                         if dangerState == 1:
                             # 切回来
                             print("切回来")
-                            # dangerState = 0
+                            dangerState = 0
 
                 # Write results
                 for *xyxy, conf, cls in reversed(det):
@@ -194,14 +194,10 @@ if __name__ == "__main__":
                     keyboard.release(Key.tab)
                     keyboard.release(Key.alt)
                     dangerState = 0
-
             # Stream results
             im0 = annotator.result()
             if danger:
-                print("识别到人")
-                # cv2.putText(im0, "HongKongDoll", (200, 200), cv2.FONT_HERSHEY_SIMPLEX, 1.5, (0, 0, 255), 6)
-                cv2.imshow("Show", im0)
-                cv2.waitKey(0)
+                cv2.putText(im0, "warning!", (200, 200), cv2.FONT_HERSHEY_SIMPLEX, 1.5, (0, 0, 255), 6)
             else:
                 cv2.putText(im0, "safe", (200, 200), cv2.FONT_HERSHEY_SIMPLEX, 1.5, (0, 255, 0), 6)
             if view_img:
