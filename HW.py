@@ -118,6 +118,8 @@ if __name__ == "__main__":
     # 载入图片
     source = str(source)
     save_img = True
+
+
     webcam = source.isnumeric() or source.endswith('.txt') or source.lower().startswith(
         ('rtsp://', 'rtmp://', 'http://', 'https://'))
     if webcam:
@@ -150,6 +152,8 @@ if __name__ == "__main__":
             gn = torch.tensor(im0.shape)[[1, 0, 1, 0]]  # normalization gain whwh
             imc = im0.copy() if save_crop else im0  # for save_crop
             annotator = Annotator(im0, line_width=line_thickness, example=str(names))
+
+
             if len(det):
                 # Rescale boxes from img_size to im0 size
                 det[:, :4] = scale_coords(img.shape[2:], det[:, :4], im0.shape).round()
@@ -160,20 +164,6 @@ if __name__ == "__main__":
                     # 人是names[0]
                     if c == 0 and n > 0:
                         danger = True
-                        if dangerState == 0:
-                            # 切屏
-                            print("切屏")
-                            # keyboard.press(Key.alt)
-                            # keyboard.press(Key.tab)
-                            # keyboard.release(Key.tab)
-                            # keyboard.release(Key.alt)
-                            # dangerState = 1
-                    elif c == 0 and n == 0:
-                        print(dangerState)
-                        if dangerState == 1:
-                            # 切回来
-                            print("切回来")
-                            # dangerState = 0
 
                 # Write results
                 for *xyxy, conf, cls in reversed(det):
@@ -191,19 +181,12 @@ if __name__ == "__main__":
                             save_one_box(xyxy, imc, file=save_dir / 'crops' / names[c] / f'{p.stem}.jpg', BGR=True)
             else:
                 if dangerState == 1:
-                    # 切回来
-                    print("切回来")
-                    keyboard.press(Key.alt)
-                    keyboard.press(Key.tab)
-                    keyboard.release(Key.tab)
-                    keyboard.release(Key.alt)
                     dangerState = 0
 
             # Stream results
             im0 = annotator.result()
             if danger:
                 print("识别到人")
-                # cv2.putText(im0, "HongKongDoll", (200, 200), cv2.FONT_HERSHEY_SIMPLEX, 1.5, (0, 0, 255), 6)
                 cv2.imshow("show", im0)
                 cv2.waitKey(0)
             else:
@@ -213,23 +196,24 @@ if __name__ == "__main__":
                 cv2.waitKey(1)  # 1 millisecond
 
             # Save results (image with detections)
-            if save_img:
-                if dataset.mode == 'image':
-                    cv2.imwrite(save_path, im0)
-                else:  # 'video' or 'stream'
-                    if vid_path[i] != save_path:  # new video
-                        vid_path[i] = save_path
-                        if isinstance(vid_writer[i], cv2.VideoWriter):
-                            vid_writer[i].release()  # release previous video writer
-                        if vid_cap:  # video
-                            fps = vid_cap.get(cv2.CAP_PROP_FPS)
-                            w = int(vid_cap.get(cv2.CAP_PROP_FRAME_WIDTH))
-                            h = int(vid_cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
-                        else:  # stream
-                            fps, w, h = 30, im0.shape[1], im0.shape[0]
-                            save_path += '.mp4'
-                        vid_writer[i] = cv2.VideoWriter(save_path, cv2.VideoWriter_fourcc(*'mp4v'), fps, (w, h))
-                    vid_writer[i].write(im0)
+            #视频相关后续操作
+            # if save_img:
+            #     if dataset.mode == 'image':
+            #         cv2.imwrite(save_path, im0)
+            #     else:  # 'video' or 'stream'
+            #         if vid_path[i] != save_path:  # new video
+            #             vid_path[i] = save_path
+            #             if isinstance(vid_writer[i], cv2.VideoWriter):
+            #                 vid_writer[i].release()  # release previous video writer
+            #             if vid_cap:  # video
+            #                 fps = vid_cap.get(cv2.CAP_PROP_FPS)
+            #                 w = int(vid_cap.get(cv2.CAP_PROP_FRAME_WIDTH))
+            #                 h = int(vid_cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
+            #             else:  # stream
+            #                 fps, w, h = 30, im0.shape[1], im0.shape[0]
+            #                 save_path += '.mp4'
+            #             vid_writer[i] = cv2.VideoWriter(save_path, cv2.VideoWriter_fourcc(*'mp4v'), fps, (w, h))
+            #         vid_writer[i].write(im0)
 
 
 
