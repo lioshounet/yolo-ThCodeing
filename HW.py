@@ -131,8 +131,6 @@ if __name__ == "__main__":
     vid_path, vid_writer = [None] * bs, [None] * bs
     save_dir = increment_path(Path(project) / name, exist_ok=exist_ok)  # increment run
     (save_dir / 'labels' if save_txt else save_dir).mkdir(parents=True, exist_ok=exist_ok)  # make dir
-    dangerState = 0
-
 
     for path, img, im0s, vid_cap in dataset:
         pred, dt, seen, img = runInterface(model, save_dir, device, half, conf_thres, iou_thres, None, agnostic_nms,
@@ -141,7 +139,10 @@ if __name__ == "__main__":
         # 这个pred是非常重要的数据，是最终的结果
         # 内涵一个tensor类型的二维数组，每个小数组的最后一位是结果，其他的东西疑似坐标
         # 所有的数据全部是类似科学记数法的tensor类型
-        print(pred)
+        #但是好像取出来也挺简单的？？？？？？？？？
+        print(pred[0][0][0])
+        print(float(pred[0][0][0]))
+
         for i, det in enumerate(pred):  # per image
             seen += 1
             if webcam:  # batch_size >= 1
@@ -157,7 +158,6 @@ if __name__ == "__main__":
             imc = im0.copy() if save_crop else im0  # for save_crop
             annotator = Annotator(im0, line_width=line_thickness, example=str(names))
 
-
             if len(det):
                 # Rescale boxes from img_size to im0 size
                 det[:, :4] = scale_coords(img.shape[2:], det[:, :4], im0.shape).round()
@@ -170,7 +170,8 @@ if __name__ == "__main__":
 
                 # Write results
                 for *xyxy, conf, cls in reversed(det):
-                    if save_txt:  # Write to file
+                    #重要突破口，txt生成源码
+                    if save_txt:
                         xywh = (xyxy2xywh(torch.tensor(xyxy).view(1, 4)) / gn).view(-1).tolist()  # normalized xywh
                         line = (cls, *xywh, conf) if save_conf else (cls, *xywh)  # label format
                         with open(txt_path + '.txt', 'a') as f:
@@ -182,9 +183,6 @@ if __name__ == "__main__":
                         annotator.box_label(xyxy, label, color=colors(c, True))
                         if save_crop:
                             save_one_box(xyxy, imc, file=save_dir / 'crops' / names[c] / f'{p.stem}.jpg', BGR=True)
-            else:
-                if dangerState == 1:
-                    dangerState = 0
 
             # Stream results
             im0 = annotator.result()
@@ -194,7 +192,9 @@ if __name__ == "__main__":
             cv2.waitKey(0)
 
             if save_img:
+                # 这个if是做视频区别，视频的else已经删除
                 if dataset.mode == 'image':
+                    # save_path是动态的，注意一下
                     cv2.imwrite(save_path, im0)
 
 
