@@ -140,8 +140,11 @@ if __name__ == "__main__":
         # 内涵一个tensor类型的二维数组，每个小数组的最后一位是结果，其他的东西疑似坐标
         # 所有的数据全部是类似科学记数法的tensor类型
         #但是好像取出来也挺简单的？？？？？？？？？
-        print(pred[0][0][0])
-        print(float(pred[0][0][0]))
+
+        RNs = []
+        for RN in pred[0]:
+            RNs.append(int(RN[5]))
+        print(RNs)
 
         for i, det in enumerate(pred):  # per image
             seen += 1
