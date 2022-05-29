@@ -14,6 +14,7 @@ import numpy as np
 import torch
 import torch.backends.cudnn as cudnn
 from pynput.keyboard import Key, Controller
+import rnsMod
 
 keyboard = Controller()
 FILE = Path(__file__).resolve()
@@ -144,7 +145,7 @@ if __name__ == "__main__":
         RNs = []
         for RN in pred[0]:
             RNs.append(int(RN[5]))
-        print(RNs)
+        print(rnsMod.modCheack(RNs, 0))
 
         for i, det in enumerate(pred):  # per image
             seen += 1
@@ -166,10 +167,8 @@ if __name__ == "__main__":
                 det[:, :4] = scale_coords(img.shape[2:], det[:, :4], im0.shape).round()
 
                 # Print results
-                print('\n')
                 for c in det[:, -1].unique():
                     n = (det[:, -1] == c).sum()  # detections per class
-                    # 人是names[0]
 
                 # Write results
                 for *xyxy, conf, cls in reversed(det):
@@ -190,7 +189,7 @@ if __name__ == "__main__":
             # Stream results
             im0 = annotator.result()
 
-            print("识别结束")
+            print("程序结束")
             cv2.imshow("show", im0)
             cv2.waitKey(0)
 
@@ -199,6 +198,4 @@ if __name__ == "__main__":
                 if dataset.mode == 'image':
                     # save_path是动态的，注意一下
                     cv2.imwrite(save_path, im0)
-
-
 
